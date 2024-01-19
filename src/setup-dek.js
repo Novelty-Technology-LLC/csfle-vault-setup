@@ -19,18 +19,21 @@ const {
 // Mongo Paths + URI
 const MONGODB_URI = `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_CLUSTER_NAME}.mongodb.net/?retryWrites=true&w=majority`;
 
-async function setupKeyVaultDb() {
-  const keyVaultClient = new MongoClient(MONGODB_URI);
-
-  try {
-    await keyVaultClient.connect();
-    const keyVaultDB = keyVaultClient.db(KEY_VAULT_DB_NAME);
-    // Drop the Key Vault Collection in case if you need to create new one.
+const setupKeyVaultDb = async (client, cleanDb, cleanCollection) => {
+  const keyVaultDB = client.db(KEY_VAULT_DB_NAME);
+  // Drop the Key Vault Collection in case if you need to create new one.
+  if (cleanDb) {
     // await keyVaultDB.dropDatabase();
-    // console.log('Key Vault Db dropped and new created.');
+    console.log(
+      `Key Vault DB dropped and created new as '${KEY_VAULT_DB_NAME}'.`
+    );
+  }
 
+  if (cleanCollection) {
     keyVaultDB.dropCollection(KEY_VAULT_COLLECTION_NAME);
-    console.log("Key Vault Collection dropped and new created.");
+    console.log(
+      `Key Vault Collection dropped and created new as '${KEY_VAULT_COLLECTION_NAME}'.`
+    );
 
     // start-create-index
     const keyVaultCol = keyVaultDB.collection(KEY_VAULT_COLLECTION_NAME);
@@ -43,21 +46,20 @@ async function setupKeyVaultDb() {
     );
     // end-create-index
     console.log("Collection Index created.");
-  } catch (err) {
-    console.log(err);
-  } finally {
-    await keyVaultClient.close();
   }
-}
+};
 
-async function init(isSetupKeyVaultDb = false) {
-  if (isSetupKeyVaultDb) await setupKeyVaultDb();
+const setupDEK = async (args) => {
+  const { cleanDb, cleanCollection } = args;
 
   const client = new MongoClient(MONGODB_URI);
 
   try {
-    const keyVaultNamespace = `${KEY_VAULT_DB_NAME}.${KEY_VAULT_COLLECTION_NAME}`;
     await client.connect();
+
+    await setupKeyVaultDb(client, cleanDb, cleanCollection);
+
+    const keyVaultNamespace = `${KEY_VAULT_DB_NAME}.${KEY_VAULT_COLLECTION_NAME}`;
 
     const encryption = new ClientEncryption(client, {
       keyVaultNamespace,
@@ -65,6 +67,7 @@ async function init(isSetupKeyVaultDb = false) {
         aws: { accessKeyId: AWS_ACCESS_KEY, secretAccessKey: AWS_SECRET_KEY },
       },
     });
+
     // start-create-dek
     const options = {
       masterKey: { key: AWS_ARN, region: AWS_REGION },
@@ -79,6 +82,6 @@ async function init(isSetupKeyVaultDb = false) {
   } finally {
     await client.close();
   }
-}
+};
 
-init(true);
+module.exports = { setupDEK };

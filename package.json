@@ -2,16 +2,20 @@
   "name": "csfle",
   "version": "1.0.0",
   "description": "Data Access Key(DAK) Setup based on CSFLE guide at https://developer.mongodb.com",
-  "main": "dak-setup.js",
+  "main": "src/index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node dak-setup.js",
+    "start": "node src/index.js",
+    "start-c": "node src/index.js --cleanCollection",
+    "start-d": "node src/index.js --cleanDb",
+    "start-dc": "node src/index.js --cleanDb --cleanCollection",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Sujan Maharjan",
   "dependencies": {
     "dotenv": "^16.3.1",
     "mongodb": "^6.3.0",
-    "mongodb-client-encryption": "^6.0.0"
+    "mongodb-client-encryption": "^6.0.0",
+    "yargs": "^17.7.2"
   }
 }

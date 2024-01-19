@@ -6,9 +6,8 @@
   "type": "commonjs",
   "scripts": {
     "start": "node src/index.js",
-    "start-c": "node src/index.js --cleanCollection",
-    "start-d": "node src/index.js --cleanDb",
-    "start-dc": "node src/index.js --cleanDb --cleanCollection",
+    "start:c": "node src/index.js :-cleanCollection",
+    "start:d": "node src/index.js :-cleanDb",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Sujan Maharjan",

@@ -20,20 +20,23 @@ const {
 const MONGODB_URI = `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_CLUSTER_NAME}.mongodb.net/?retryWrites=true&w=majority`;
 
 const setupKeyVaultDb = async (client, cleanDb, cleanCollection) => {
-  const keyVaultDB = client.db(KEY_VAULT_DB_NAME);
-  // Drop the Key Vault Collection in case if you need to create new one.
-  if (cleanDb) {
-    // await keyVaultDB.dropDatabase();
-    console.log(
-      `Key Vault DB dropped and created new as '${KEY_VAULT_DB_NAME}'.`
-    );
-  }
+  if (cleanDb || cleanCollection) {
+    const keyVaultDB = client.db(KEY_VAULT_DB_NAME);
 
-  if (cleanCollection) {
-    keyVaultDB.dropCollection(KEY_VAULT_COLLECTION_NAME);
-    console.log(
-      `Key Vault Collection dropped and created new as '${KEY_VAULT_COLLECTION_NAME}'.`
-    );
+    if (cleanDb) {
+      // await keyVaultDB.dropDatabase();
+      console.log(
+        `Key Vault DB dropped and created new as '${KEY_VAULT_DB_NAME}'.`
+      );
+    }
+
+    if (cleanCollection) {
+      // Drop the Key Vault Collection in case if you need to create new one.
+      keyVaultDB.dropCollection(KEY_VAULT_COLLECTION_NAME);
+      console.log(
+        `Key Vault Collection dropped and created new as '${KEY_VAULT_COLLECTION_NAME}'.`
+      );
+    }
 
     // start-create-index
     const keyVaultCol = keyVaultDB.collection(KEY_VAULT_COLLECTION_NAME);
